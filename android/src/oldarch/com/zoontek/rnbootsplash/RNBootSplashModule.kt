@@ -40,4 +40,9 @@ class RNBootSplashModule(reactContext: ReactApplicationContext) :
   fun isVisible(promise: Promise) {
     RNBootSplashModuleImpl.isVisible(promise)
   }
+
+  @ReactMethod
+  fun setState(state: String) {
+    RNBootSplashModuleImpl.setState(state)
+  }
 }

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Dialog
 import android.os.Bundle
 import android.view.WindowManager
+import android.widget.TextView
 
 import androidx.annotation.StyleRes
 
@@ -12,6 +13,8 @@ class RNBootSplashDialog(
   @StyleRes themeResId: Int,
   private val fade: Boolean
 ) : Dialog(activity, themeResId) {
+
+  private var statusTextView: TextView? = null
 
   init {
     setOwnerActivity(activity)
@@ -55,7 +58,42 @@ class RNBootSplashDialog(
     }
   }
 
+  fun setStatusText(text: String) {
+    statusTextView?.let { textView ->
+      if (text.isEmpty()) {
+        textView.visibility = android.view.View.GONE
+      } else {
+        textView.text = text
+        textView.visibility = android.view.View.VISIBLE
+      }
+    }
+  }
+
   override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    
+    // Set the custom layout
+    setContentView(R.layout.bootsplash_layout)
+    
+    // Get reference to status TextView
+    statusTextView = findViewById(R.id.bootsplash_status)
+    
+    // Initialize with current state from RNBootSplashModuleImpl
+    val currentState = RNBootSplashModuleImpl.getCurrentState()
+    val statusText = when (currentState) {
+      "updating" -> "updating..."
+      "updated" -> "updated ✅"
+      else -> ""
+    }
+    
+    // Set initial text and visibility
+    if (statusText.isNotEmpty()) {
+      statusTextView?.text = statusText
+      statusTextView?.visibility = android.view.View.VISIBLE
+    } else {
+      statusTextView?.visibility = android.view.View.GONE
+    }
+
     window?.apply {
       setLayout(
         WindowManager.LayoutParams.MATCH_PARENT,
@@ -73,7 +111,5 @@ class RNBootSplashDialog(
         setBackgroundDrawableResource(R.drawable.compat_splash_screen_oneui_4)
       }
     }
-
-    super.onCreate(savedInstanceState)
   }
 }

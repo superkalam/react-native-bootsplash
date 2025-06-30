@@ -276,8 +276,13 @@ export function useHideAnimation(config: UseHideAnimationConfig) {
   ]);
 }
 
+export function setState(state: "default" | "updating" | "updated") {
+  NativeModule.setState(state);
+}
+
 export default {
   hide,
   isVisible,
   useHideAnimation,
+  setState,
 };

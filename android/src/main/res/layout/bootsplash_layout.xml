@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/bootSplashBackground">
+
+    <!-- Logo ImageView centered in the screen -->
+    <ImageView
+        android:id="@+id/bootsplash_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:src="?attr/bootSplashLogo"
+        android:contentDescription="@null"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter" />
+
+    <!-- Status text positioned at bottom -->
+    <TextView
+        android:id="@+id/bootsplash_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60dp"
+        android:text=""
+        android:textSize="16sp"
+        android:textColor="?android:attr/textColorPrimary"
+        android:alpha="0.8"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:visibility="gone" />
+
+</RelativeLayout> 

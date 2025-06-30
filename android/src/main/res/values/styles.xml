@@ -20,7 +20,6 @@
     <style name="Theme.BootSplash.Common" parent="Theme.BootSplash.Base">
         <item name="android:opacity">opaque</item>
         <item name="android:windowBackground">@drawable/compat_splash_screen</item>
-        <item name="bootSplashBrand">@drawable/transparent_pixel</item>
     </style>
 
     <style name="Theme.BootSplash" parent="Theme.BootSplash.Common">
