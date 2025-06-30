@@ -65,6 +65,7 @@ class RNBootSplashDialog(
     mainHandler.post {
       statusTextView?.let { textView ->
         if (text.isEmpty()) {
+          textView.text = text
           textView.visibility = android.view.View.GONE
         } else {
           textView.text = text
@@ -86,8 +87,8 @@ class RNBootSplashDialog(
     // Initialize with current state from RNBootSplashModuleImpl
     val currentState = RNBootSplashModuleImpl.getCurrentState()
     val statusText = when (currentState) {
-      "updating" -> "updating..."
-      "updated" -> "updated ✅"
+      "updating" -> "Updating App..."
+      "updated" -> "Updated ✅"
       else -> ""
     }
     
@@ -96,6 +97,7 @@ class RNBootSplashDialog(
       statusTextView?.text = statusText
       statusTextView?.visibility = android.view.View.VISIBLE
     } else {
+      statusTextView?.text = statusText
       statusTextView?.visibility = android.view.View.GONE
     }
 

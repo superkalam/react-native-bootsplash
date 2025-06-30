@@ -28,9 +28,9 @@ function updateStatusText() {
   // Add new status text if needed
   const statusText =
     webCurrentState === "updating"
-      ? "updating..."
+      ? "Updating App..."
       : webCurrentState === "updated"
-        ? "updated ✅"
+        ? "Updated ✅"
         : "";
 
   if (statusText) {

@@ -246,8 +246,8 @@ object RNBootSplashModuleImpl {
     mCurrentState = state
     
     val statusText = when (state) {
-      "updating" -> "updating..."
-      "updated" -> "updated ✅"
+      "updating" -> "Updating App..."
+      "updated" -> "Updated ✅"
       else -> ""
     }
     

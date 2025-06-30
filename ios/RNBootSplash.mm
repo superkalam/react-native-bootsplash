@@ -185,10 +185,10 @@ RCT_EXPORT_MODULE();
   dispatch_async(dispatch_get_main_queue(), ^{
     if (_statusLabel != nil && _loadingView != nil && ![_loadingView isHidden]) {
       if ([state isEqualToString:@"updating"]) {
-        _statusLabel.text = @"updating...";
+        _statusLabel.text = @"Updating App...";
         _statusLabel.hidden = NO;
       } else if ([state isEqualToString:@"updated"]) {
-        _statusLabel.text = @"updated ✅";
+        _statusLabel.text = @"Updated ✅";
         _statusLabel.hidden = NO;
       } else {
         _statusLabel.hidden = YES;
