@@ -17,7 +17,7 @@ static UIView *_loadingView = nil;
 static NSMutableArray<RCTPromiseResolveBlock> *_resolveQueue = [[NSMutableArray alloc] init];
 static bool _fade = false;
 static bool _nativeHidden = false;
-static NSString *_currentState = @"default";
+static NSString *_currentText = @"";
 static UILabel *_statusLabel = nil;
 
 @implementation RNBootSplash
@@ -171,29 +171,21 @@ RCT_EXPORT_MODULE();
 
   return @{
     @"darkModeEnabled": @(darkModeEnabled),
-    @"currentState": _currentState
+    @"currentText": _currentText
   };
 }
 
-- (void)setStateImpl:(NSString *)state {
+- (void)setTextImpl:(NSString *)text {
   if (RCTRunningInAppExtension()) {
     return;
   }
   
-  _currentState = state;
+  _currentText = text;
   
   dispatch_async(dispatch_get_main_queue(), ^{
     if (_statusLabel != nil && _loadingView != nil && ![_loadingView isHidden]) {
-      if ([state isEqualToString:@"updating"]) {
-        _statusLabel.text = @"Updating App...";
-        _statusLabel.hidden = NO;
-      } else if ([state isEqualToString:@"updated"]) {
-        _statusLabel.text = @"Updated ✅";
-        _statusLabel.hidden = NO;
-      } else {
-        _statusLabel.hidden = YES;
-        _statusLabel.text = @"";
-      }
+      _statusLabel.text = text;
+      _statusLabel.hidden = text.length > 0;
     }
   });
 }
@@ -239,8 +231,8 @@ RCT_EXPORT_MODULE();
   [self isVisibleImpl:resolve];
 }
 
-- (void)setState:(NSString *)state {
-  [self setStateImpl:state];
+- (void)setText:(NSString *)text {
+  [self setTextImpl:text];
 }
 
 #else
@@ -258,8 +250,8 @@ RCT_EXPORT_METHOD(isVisible:(RCTPromiseResolveBlock)resolve
   [self isVisibleImpl:resolve];
 }
 
-RCT_EXPORT_METHOD(setState:(NSString *)state) {
-  [self setStateImpl:state];
+RCT_EXPORT_METHOD(setText:(NSString *)text) {
+  [self setTextImpl:text];
 }
 
 #endif

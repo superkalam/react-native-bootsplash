@@ -276,13 +276,13 @@ export function useHideAnimation(config: UseHideAnimationConfig) {
   ]);
 }
 
-export function setState(state: "default" | "updating" | "updated") {
-  NativeModule.setState(state);
+export function setText(text: string) {
+  NativeModule.setText(text);
 }
 
 export default {
   hide,
   isVisible,
   useHideAnimation,
-  setState,
+  setText,
 };

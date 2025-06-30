@@ -13,7 +13,7 @@ function removeNode(node: Node | null) {
 }
 
 // Web state management
-let webCurrentState = "default";
+let webCurrentText = "";
 
 function updateStatusText() {
   const container = document.getElementById("bootsplash");
@@ -26,12 +26,7 @@ function updateStatusText() {
   }
 
   // Add new status text if needed
-  const statusText =
-    webCurrentState === "updating"
-      ? "Updating App..."
-      : webCurrentState === "updated"
-        ? "Updated ✅"
-        : "";
+  const statusText = webCurrentText;
 
   if (statusText) {
     const statusDiv = document.createElement("div");
@@ -58,7 +53,7 @@ export default {
       typeof window !== "undefined" &&
       "matchMedia" in window &&
       window.matchMedia("(prefers-color-scheme: dark)").matches,
-    currentState: webCurrentState,
+    currentState: webCurrentText,
   }),
 
   hide: (fade) =>
@@ -86,8 +81,8 @@ export default {
     return Promise.resolve(container != null);
   },
 
-  setState: (state: "default" | "updating" | "updated") => {
-    webCurrentState = state;
+  setText: (text: string) => {
+    webCurrentText = text;
     updateStatusText();
   },
 } satisfies Spec;

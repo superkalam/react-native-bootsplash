@@ -85,12 +85,8 @@ class RNBootSplashDialog(
     statusTextView = findViewById(R.id.bootsplash_status)
     
     // Initialize with current state from RNBootSplashModuleImpl
-    val currentState = RNBootSplashModuleImpl.getCurrentState()
-    val statusText = when (currentState) {
-      "updating" -> "Updating App..."
-      "updated" -> "Updated ✅"
-      else -> ""
-    }
+    val currentText = RNBootSplashModuleImpl.getCurrentText()
+    val statusText = currentText
     
     // Set initial text and visibility (onCreate is already on main thread)
     if (statusText.isNotEmpty()) {

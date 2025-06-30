@@ -2,13 +2,13 @@ import type { TurboModule } from "react-native";
 import { TurboModuleRegistry } from "react-native";
 
 export interface Spec extends TurboModule {
-  setState(state: "default" | "updating" | "updated"): void;
+  setText(text: string): void;
   getConstants(): {
     darkModeEnabled: boolean;
     logoSizeRatio?: number;
     navigationBarHeight?: number;
     statusBarHeight?: number;
-    currentState?: string;
+    currentText?: string;
   };
   hide(fade: boolean): Promise<void>;
   isVisible(): Promise<boolean>;

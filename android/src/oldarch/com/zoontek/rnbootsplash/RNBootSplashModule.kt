@@ -42,7 +42,7 @@ class RNBootSplashModule(reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun setState(state: String) {
-    RNBootSplashModuleImpl.setState(state)
+  fun setText(text: String) {
+    RNBootSplashModuleImpl.setText(text)
   }
 }
