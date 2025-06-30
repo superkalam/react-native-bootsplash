@@ -3,6 +3,8 @@ package com.zoontek.rnbootsplash
 import android.app.Activity
 import android.app.Dialog
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.WindowManager
 import android.widget.TextView
 
@@ -15,6 +17,7 @@ class RNBootSplashDialog(
 ) : Dialog(activity, themeResId) {
 
   private var statusTextView: TextView? = null
+  private val mainHandler = Handler(Looper.getMainLooper())
 
   init {
     setOwnerActivity(activity)
@@ -59,12 +62,14 @@ class RNBootSplashDialog(
   }
 
   fun setStatusText(text: String) {
-    statusTextView?.let { textView ->
-      if (text.isEmpty()) {
-        textView.visibility = android.view.View.GONE
-      } else {
-        textView.text = text
-        textView.visibility = android.view.View.VISIBLE
+    mainHandler.post {
+      statusTextView?.let { textView ->
+        if (text.isEmpty()) {
+          textView.visibility = android.view.View.GONE
+        } else {
+          textView.text = text
+          textView.visibility = android.view.View.VISIBLE
+        }
       }
     }
   }
@@ -86,7 +91,7 @@ class RNBootSplashDialog(
       else -> ""
     }
     
-    // Set initial text and visibility
+    // Set initial text and visibility (onCreate is already on main thread)
     if (statusText.isNotEmpty()) {
       statusTextView?.text = statusText
       statusTextView?.visibility = android.view.View.VISIBLE
