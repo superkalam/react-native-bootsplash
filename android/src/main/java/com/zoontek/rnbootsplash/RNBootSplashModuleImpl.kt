@@ -228,7 +228,7 @@ object RNBootSplashModuleImpl {
     constants["logoSizeRatio"] = if (isSamsungOneUI4()) 0.5 else 1.0
     constants["navigationBarHeight"] = navigationBarHeight
     constants["statusBarHeight"] = statusBarHeight
-    constants["currentText"] = mCurrentState
+    constants["currentText"] = mCurrentText
 
     return constants
   }
