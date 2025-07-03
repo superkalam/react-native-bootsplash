@@ -112,7 +112,7 @@ RCT_EXPORT_MODULE();
     _statusLabel = [[UILabel alloc] init];
     _statusLabel.textAlignment = NSTextAlignmentCenter;
     _statusLabel.font = [UIFont systemFontOfSize:16 weight:UIFontWeightMedium];
-    _statusLabel.alpha = 0.8;
+    _statusLabel.alpha = 1.0;
     _statusLabel.hidden = YES;
     _statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
     
@@ -128,7 +128,7 @@ RCT_EXPORT_MODULE();
     // Set up constraints for status label
     [NSLayoutConstraint activateConstraints:@[
       [_statusLabel.centerXAnchor constraintEqualToAnchor:_loadingView.centerXAnchor],
-      [_statusLabel.bottomAnchor constraintEqualToAnchor:_loadingView.safeAreaLayoutGuide.bottomAnchor constant:-60],
+      [_statusLabel.bottomAnchor constraintEqualToAnchor:_loadingView.safeAreaLayoutGuide.bottomAnchor constant:-120],
       [_statusLabel.leadingAnchor constraintGreaterThanOrEqualToAnchor:_loadingView.leadingAnchor constant:20],
       [_statusLabel.trailingAnchor constraintLessThanOrEqualToAnchor:_loadingView.trailingAnchor constant:-20]
     ]];
@@ -180,12 +180,17 @@ RCT_EXPORT_MODULE();
     return;
   }
   
+  // Handle null text parameter from JavaScript
+  if (text == nil) {
+    text = @"";
+  }
+  
   _currentText = text;
   
   dispatch_async(dispatch_get_main_queue(), ^{
     if (_statusLabel != nil && _loadingView != nil && ![_loadingView isHidden]) {
       _statusLabel.text = text;
-      _statusLabel.hidden = text.length > 0;
+      _statusLabel.hidden = text.length == 0;
     }
   });
 }
