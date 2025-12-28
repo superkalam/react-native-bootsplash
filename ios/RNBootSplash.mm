@@ -17,6 +17,8 @@ static UIView *_loadingView = nil;
 static NSMutableArray<RCTPromiseResolveBlock> *_resolveQueue = [[NSMutableArray alloc] init];
 static bool _fade = false;
 static bool _nativeHidden = false;
+static NSString *_currentText = @"";
+static UILabel *_statusLabel = nil;
 
 @implementation RNBootSplash
 
@@ -58,6 +60,7 @@ RCT_EXPORT_MODULE();
                       completion:^(__unused BOOL finished) {
         [_loadingView removeFromSuperview];
         _loadingView = nil;
+        _statusLabel = nil;
 
         return [RNBootSplash clearResolveQueue];
       }];
@@ -66,6 +69,7 @@ RCT_EXPORT_MODULE();
     _loadingView.hidden = YES;
     [_loadingView removeFromSuperview];
     _loadingView = nil;
+    _statusLabel = nil;
 
     return [RNBootSplash clearResolveQueue];
   }
@@ -104,6 +108,31 @@ RCT_EXPORT_MODULE();
     _loadingView.center = (CGPoint){CGRectGetMidX(_rootView.bounds), CGRectGetMidY(_rootView.bounds)};
     _loadingView.hidden = NO;
 
+    // Create and add status label
+    _statusLabel = [[UILabel alloc] init];
+    _statusLabel.textAlignment = NSTextAlignmentCenter;
+    _statusLabel.font = [UIFont systemFontOfSize:16 weight:UIFontWeightMedium];
+    _statusLabel.alpha = 1.0;
+    _statusLabel.hidden = YES;
+    _statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    // Set text color based on dark mode
+    if (@available(iOS 13.0, *)) {
+      _statusLabel.textColor = [UIColor labelColor];
+    } else {
+      _statusLabel.textColor = [UIColor blackColor];
+    }
+    
+    [_loadingView addSubview:_statusLabel];
+    
+    // Set up constraints for status label
+    [NSLayoutConstraint activateConstraints:@[
+      [_statusLabel.centerXAnchor constraintEqualToAnchor:_loadingView.centerXAnchor],
+      [_statusLabel.bottomAnchor constraintEqualToAnchor:_loadingView.safeAreaLayoutGuide.bottomAnchor constant:-120],
+      [_statusLabel.leadingAnchor constraintGreaterThanOrEqualToAnchor:_loadingView.leadingAnchor constant:20],
+      [_statusLabel.trailingAnchor constraintLessThanOrEqualToAnchor:_loadingView.trailingAnchor constant:-20]
+    ]];
+
 #if RCT_NEW_ARCH_ENABLED
     [_rootView disableActivityIndicatorAutoHide:YES];
     [_rootView setLoadingView:_loadingView];
@@ -141,8 +170,29 @@ RCT_EXPORT_MODULE();
   });
 
   return @{
-    @"darkModeEnabled": @(darkModeEnabled)
+    @"darkModeEnabled": @(darkModeEnabled),
+    @"currentText": _currentText
   };
+}
+
+- (void)setTextImpl:(NSString *)text {
+  if (RCTRunningInAppExtension()) {
+    return;
+  }
+  
+  // Handle null text parameter from JavaScript
+  if (text == nil) {
+    text = @"";
+  }
+  
+  _currentText = text;
+  
+  dispatch_async(dispatch_get_main_queue(), ^{
+    if (_statusLabel != nil && _loadingView != nil && ![_loadingView isHidden]) {
+      _statusLabel.text = text;
+      _statusLabel.hidden = text.length == 0;
+    }
+  });
 }
 
 - (void)hideImpl:(BOOL)fade
@@ -186,6 +236,10 @@ RCT_EXPORT_MODULE();
   [self isVisibleImpl:resolve];
 }
 
+- (void)setText:(NSString *)text {
+  [self setTextImpl:text];
+}
+
 #else
 
 // Old architecture
@@ -199,6 +253,10 @@ RCT_EXPORT_METHOD(hide:(BOOL)fade
 RCT_EXPORT_METHOD(isVisible:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject) {
   [self isVisibleImpl:resolve];
+}
+
+RCT_EXPORT_METHOD(setText:(NSString *)text) {
+  [self setTextImpl:text];
 }
 
 #endif

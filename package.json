@@ -48,7 +48,7 @@
     "lint": "eslint --ext ts,tsx ./src",
     "typecheck": "tsc --noEmit",
     "build": "yarn clean && bob build && rm -rf dist/*/package.json",
-    "prepack": "prettier '**/*' -u -c && yarn lint && yarn typecheck && yarn build && node ../obfuscator"
+    "prepack": "prettier '**/*' -u -c && yarn lint && yarn typecheck && yarn build"
   },
   "react-native-builder-bob": {
     "source": "src",

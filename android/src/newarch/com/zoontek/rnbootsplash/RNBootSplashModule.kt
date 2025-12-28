@@ -36,4 +36,8 @@ class RNBootSplashModule(reactContext: ReactApplicationContext) :
   override fun isVisible(promise: Promise) {
     RNBootSplashModuleImpl.isVisible(promise)
   }
+
+  override fun setText(text: String) {
+    RNBootSplashModuleImpl.setText(text)
+  }
 }

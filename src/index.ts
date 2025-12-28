@@ -276,8 +276,13 @@ export function useHideAnimation(config: UseHideAnimationConfig) {
   ]);
 }
 
+export function setText(text: string) {
+  NativeModule.setText(text);
+}
+
 export default {
   hide,
   isVisible,
   useHideAnimation,
+  setText,
 };

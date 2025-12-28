@@ -33,6 +33,7 @@ object RNBootSplashModuleImpl {
 
   private val mPromiseQueue = RNBootSplashQueue<Promise>()
   private var mStatus = Status.HIDDEN
+  private var mCurrentText = ""
 
   @StyleRes
   private var mThemeResId = -1
@@ -227,6 +228,7 @@ object RNBootSplashModuleImpl {
     constants["logoSizeRatio"] = if (isSamsungOneUI4()) 0.5 else 1.0
     constants["navigationBarHeight"] = navigationBarHeight
     constants["statusBarHeight"] = statusBarHeight
+    constants["currentText"] = mCurrentText
 
     return constants
   }
@@ -238,5 +240,19 @@ object RNBootSplashModuleImpl {
 
   fun isVisible(promise: Promise) {
     promise.resolve(mStatus != Status.HIDDEN)
+  }
+
+  fun setText(text: String) {
+    mCurrentText = text
+    
+    val statusText = text
+    
+    // Update the status text in the current dialogs
+    mInitialDialog?.setStatusText(statusText)
+    mFadeOutDialog?.setStatusText(statusText)
+  }
+
+  fun getCurrentText(): String {
+    return mCurrentText
   }
 }
