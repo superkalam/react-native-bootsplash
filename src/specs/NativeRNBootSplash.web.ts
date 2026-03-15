@@ -44,4 +44,27 @@ export default {
     const container = document.getElementById("bootsplash");
     return container != null;
   },
+
+  setText: (text: string) => {
+    const statusElement = document.getElementById("bootsplash-status");
+    if (statusElement != null) {
+      statusElement.textContent = text;
+      statusElement.style.display = text ? "block" : "none";
+    }
+  },
+
+  setTextColor: (lightColor: string, darkColor: string | null) => {
+    const statusElement = document.getElementById("bootsplash-status");
+    if (statusElement != null) {
+      const isDarkMode =
+        typeof window !== "undefined" &&
+        "matchMedia" in window &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+      const colorToUse = isDarkMode && darkColor ? darkColor : lightColor;
+      if (colorToUse) {
+        statusElement.style.color = colorToUse;
+      }
+    }
+  },
 } satisfies Spec;

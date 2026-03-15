@@ -17,6 +17,10 @@ static UIView *_loadingView = nil;
 static NSMutableArray<RCTPromiseResolveBlock> *_resolveQueue = [[NSMutableArray alloc] init];
 static bool _fade = false;
 static bool _nativeHidden = false;
+static NSString *_currentText = @"";
+static NSString *_lightTextColor = @"";
+static NSString *_darkTextColor = @"";
+static UILabel *_statusLabel = nil;
 
 @implementation RNBootSplash
 
@@ -58,6 +62,7 @@ RCT_EXPORT_MODULE();
                       completion:^(__unused BOOL finished) {
         [_loadingView removeFromSuperview];
         _loadingView = nil;
+        _statusLabel = nil;
 
         return [RNBootSplash clearResolveQueue];
       }];
@@ -66,6 +71,7 @@ RCT_EXPORT_MODULE();
     _loadingView.hidden = YES;
     [_loadingView removeFromSuperview];
     _loadingView = nil;
+    _statusLabel = nil;
 
     return [RNBootSplash clearResolveQueue];
   }
@@ -103,6 +109,31 @@ RCT_EXPORT_MODULE();
     _loadingView.frame = _rootView.bounds;
     _loadingView.center = (CGPoint){CGRectGetMidX(_rootView.bounds), CGRectGetMidY(_rootView.bounds)};
     _loadingView.hidden = NO;
+
+    // Create and add status label
+    _statusLabel = [[UILabel alloc] init];
+    _statusLabel.textAlignment = NSTextAlignmentCenter;
+    _statusLabel.font = [UIFont systemFontOfSize:16 weight:UIFontWeightMedium];
+    _statusLabel.alpha = 1.0;
+    _statusLabel.hidden = YES;
+    _statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
+
+    // Set text color based on dark mode
+    if (@available(iOS 13.0, *)) {
+      _statusLabel.textColor = [UIColor labelColor];
+    } else {
+      _statusLabel.textColor = [UIColor blackColor];
+    }
+
+    [_loadingView addSubview:_statusLabel];
+
+    // Set up constraints for status label
+    [NSLayoutConstraint activateConstraints:@[
+      [_statusLabel.centerXAnchor constraintEqualToAnchor:_loadingView.centerXAnchor],
+      [_statusLabel.bottomAnchor constraintEqualToAnchor:_loadingView.safeAreaLayoutGuide.bottomAnchor constant:-120],
+      [_statusLabel.leadingAnchor constraintGreaterThanOrEqualToAnchor:_loadingView.leadingAnchor constant:20],
+      [_statusLabel.trailingAnchor constraintLessThanOrEqualToAnchor:_loadingView.trailingAnchor constant:-20]
+    ]];
 
 #if RCT_NEW_ARCH_ENABLED
     [_rootView disableActivityIndicatorAutoHide:YES];
@@ -159,6 +190,85 @@ RCT_EXPORT_MODULE();
   }
 }
 
+- (void)setTextImpl:(NSString *)text {
+  if (RCTRunningInAppExtension()) {
+    return;
+  }
+
+  // Handle null text parameter from JavaScript
+  if (text == nil) {
+    text = @"";
+  }
+
+  _currentText = text;
+
+  dispatch_async(dispatch_get_main_queue(), ^{
+    if (_statusLabel != nil && _loadingView != nil && ![_loadingView isHidden]) {
+      _statusLabel.text = text;
+      _statusLabel.hidden = text.length == 0;
+    }
+  });
+}
+
+- (UIColor *)colorFromHexString:(NSString *)hexString {
+  if (hexString == nil || [hexString length] == 0) {
+    return nil;
+  }
+
+  unsigned rgbValue = 0;
+  NSString *colorString = hexString;
+
+  // Remove # if present
+  if ([colorString hasPrefix:@"#"]) {
+    colorString = [colorString substringFromIndex:1];
+  }
+
+  NSScanner *scanner = [NSScanner scannerWithString:colorString];
+  [scanner scanHexInt:&rgbValue];
+
+  return [UIColor colorWithRed:((rgbValue & 0xFF0000) >> 16)/255.0
+                         green:((rgbValue & 0xFF00) >> 8)/255.0
+                          blue:(rgbValue & 0xFF)/255.0
+                         alpha:1.0];
+}
+
+- (void)setTextColorImpl:(NSString *)lightColor darkColor:(NSString *)darkColor {
+  if (RCTRunningInAppExtension()) {
+    return;
+  }
+
+  // Handle null parameters
+  if (lightColor == nil) {
+    lightColor = @"";
+  }
+  if (darkColor == nil) {
+    darkColor = lightColor; // Use lightColor as fallback
+  }
+
+  _lightTextColor = lightColor;
+  _darkTextColor = darkColor;
+
+  dispatch_async(dispatch_get_main_queue(), ^{
+    if (_statusLabel != nil && _loadingView != nil && ![_loadingView isHidden]) {
+      UIWindow *window = RCTKeyWindow();
+      BOOL isDarkMode = NO;
+
+      if (@available(iOS 13.0, *)) {
+        isDarkMode = window != nil && window.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
+      }
+
+      NSString *colorToUse = (isDarkMode && darkColor.length > 0) ? darkColor : lightColor;
+
+      if (colorToUse.length > 0) {
+        UIColor *color = [self colorFromHexString:colorToUse];
+        if (color != nil) {
+          _statusLabel.textColor = color;
+        }
+      }
+    }
+  });
+}
+
 #ifdef RCT_NEW_ARCH_ENABLED
 
 // New architecture
@@ -177,8 +287,16 @@ RCT_EXPORT_MODULE();
   [self hideImpl:fade resolve:resolve];
 }
 
-- (nonnull NSNumber *)isVisible { 
+- (nonnull NSNumber *)isVisible {
   return @([RNBootSplash isLoadingViewVisible]);
+}
+
+- (void)setText:(NSString *)text {
+  [self setTextImpl:text];
+}
+
+- (void)setTextColor:(NSString *)lightColor darkColor:(NSString *)darkColor {
+  [self setTextColorImpl:lightColor darkColor:darkColor];
 }
 
 #else
@@ -193,6 +311,14 @@ RCT_EXPORT_METHOD(hide:(BOOL)fade
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(isVisible) {
   return @([RNBootSplash isLoadingViewVisible]);
+}
+
+RCT_EXPORT_METHOD(setText:(NSString *)text) {
+  [self setTextImpl:text];
+}
+
+RCT_EXPORT_METHOD(setTextColor:(NSString *)lightColor darkColor:(NSString *)darkColor) {
+  [self setTextColorImpl:lightColor darkColor:darkColor];
 }
 
 #endif

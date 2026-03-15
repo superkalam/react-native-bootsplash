@@ -722,6 +722,15 @@ export const writeWebAssets = async ({
         width: ${logo.width}px;
         height: ${logo.height}px;
       }
+      #bootsplash-status {
+        position: absolute;
+        bottom: 120px;
+        width: 100%;
+        text-align: center;
+        font-size: 16px;
+        font-weight: 500;
+        display: none;
+      }
     </style>
   `);
 
@@ -736,6 +745,7 @@ export const writeWebAssets = async ({
   const nextDiv = parseHtml(dedent`
     <div id="bootsplash">
       <div id="bootsplash-logo"></div>
+      <div id="bootsplash-status"></div>
     </div>
   `);
 

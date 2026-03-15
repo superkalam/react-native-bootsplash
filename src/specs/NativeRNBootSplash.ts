@@ -10,6 +10,8 @@ export interface Spec extends TurboModule {
   };
   hide(fade: boolean): Promise<void>;
   isVisible(): boolean;
+  setText(text: string): void;
+  setTextColor(lightColor: string, darkColor: string | null): void;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>("RNBootSplash");

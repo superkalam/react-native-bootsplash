@@ -33,6 +33,9 @@ object RNBootSplashModuleImpl {
 
   private val mPromiseQueue = RNBootSplashQueue<Promise>()
   private var mStatus = Status.HIDDEN
+  private var mCurrentText = ""
+  private var mLightTextColor = ""
+  private var mDarkTextColor = ""
 
   @StyleRes
   private var mThemeResId = -1
@@ -238,5 +241,34 @@ object RNBootSplashModuleImpl {
 
   fun isVisible(): Boolean {
     return mStatus != Status.HIDDEN
+  }
+
+  fun setText(text: String) {
+    mCurrentText = text
+
+    // Update the status text in the current dialogs
+    mInitialDialog?.setStatusText(text)
+    mFadeOutDialog?.setStatusText(text)
+  }
+
+  fun setTextColor(lightColor: String, darkColor: String) {
+    mLightTextColor = lightColor
+    mDarkTextColor = darkColor
+
+    // Update the text color in the current dialogs
+    mInitialDialog?.setTextColor(lightColor, darkColor)
+    mFadeOutDialog?.setTextColor(lightColor, darkColor)
+  }
+
+  fun getCurrentText(): String {
+    return mCurrentText
+  }
+
+  fun getLightTextColor(): String {
+    return mLightTextColor
+  }
+
+  fun getDarkTextColor(): String {
+    return mDarkTextColor
   }
 }

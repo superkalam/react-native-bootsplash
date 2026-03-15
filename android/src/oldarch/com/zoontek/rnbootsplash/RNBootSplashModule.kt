@@ -40,4 +40,14 @@ class RNBootSplashModule(reactContext: ReactApplicationContext) :
   fun isVisible(): Boolean {
     return RNBootSplashModuleImpl.isVisible()
   }
+
+  @ReactMethod
+  fun setText(text: String) {
+    RNBootSplashModuleImpl.setText(text)
+  }
+
+  @ReactMethod
+  fun setTextColor(lightColor: String, darkColor: String?) {
+    RNBootSplashModuleImpl.setTextColor(lightColor, darkColor ?: lightColor)
+  }
 }
