@@ -12,48 +12,12 @@ function removeNode(node: Node | null) {
   }
 }
 
-// Web state management
-let webCurrentText = "";
-
-function updateStatusText() {
-  const container = document.getElementById("bootsplash");
-  if (!container) return;
-
-  // Remove existing status text
-  const existingStatus = document.getElementById("bootsplash-status");
-  if (existingStatus) {
-    existingStatus.remove();
-  }
-
-  // Add new status text if needed
-  const statusText = webCurrentText;
-
-  if (statusText) {
-    const statusDiv = document.createElement("div");
-    statusDiv.id = "bootsplash-status";
-    statusDiv.textContent = statusText;
-    statusDiv.style.cssText = `
-      position: absolute;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 16px;
-      font-weight: 500;
-      opacity: 0.8;
-      text-align: center;
-      color: inherit;
-    `;
-    container.appendChild(statusDiv);
-  }
-}
-
 export default {
   getConstants: () => ({
     darkModeEnabled:
       typeof window !== "undefined" &&
       "matchMedia" in window &&
       window.matchMedia("(prefers-color-scheme: dark)").matches,
-    currentState: webCurrentText,
   }),
 
   hide: (fade) =>
@@ -82,7 +46,25 @@ export default {
   },
 
   setText: (text: string) => {
-    webCurrentText = text;
-    updateStatusText();
+    const statusElement = document.getElementById("bootsplash-status");
+    if (statusElement != null) {
+      statusElement.textContent = text;
+      statusElement.style.display = text ? "block" : "none";
+    }
+  },
+
+  setTextColor: (lightColor: string, darkColor: string | null) => {
+    const statusElement = document.getElementById("bootsplash-status");
+    if (statusElement != null) {
+      const isDarkMode =
+        typeof window !== "undefined" &&
+        "matchMedia" in window &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+      const colorToUse = isDarkMode && darkColor ? darkColor : lightColor;
+      if (colorToUse) {
+        statusElement.style.color = colorToUse;
+      }
+    }
   },
 } satisfies Spec;

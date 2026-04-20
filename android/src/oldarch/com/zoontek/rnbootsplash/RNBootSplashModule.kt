@@ -45,4 +45,9 @@ class RNBootSplashModule(reactContext: ReactApplicationContext) :
   fun setText(text: String) {
     RNBootSplashModuleImpl.setText(text)
   }
+
+  @ReactMethod
+  fun setTextColor(lightColor: String, darkColor: String?) {
+    RNBootSplashModuleImpl.setTextColor(lightColor, darkColor ?: lightColor)
+  }
 }

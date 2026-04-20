@@ -40,4 +40,8 @@ class RNBootSplashModule(reactContext: ReactApplicationContext) :
   override fun setText(text: String) {
     RNBootSplashModuleImpl.setText(text)
   }
+
+  override fun setTextColor(lightColor: String, darkColor: String?) {
+    RNBootSplashModuleImpl.setTextColor(lightColor, darkColor ?: lightColor)
+  }
 }

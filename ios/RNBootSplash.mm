@@ -18,6 +18,8 @@ static NSMutableArray<RCTPromiseResolveBlock> *_resolveQueue = [[NSMutableArray 
 static bool _fade = false;
 static bool _nativeHidden = false;
 static NSString *_currentText = @"";
+static NSString *_lightTextColor = @"";
+static NSString *_darkTextColor = @"";
 static UILabel *_statusLabel = nil;
 
 @implementation RNBootSplash
@@ -170,8 +172,7 @@ RCT_EXPORT_MODULE();
   });
 
   return @{
-    @"darkModeEnabled": @(darkModeEnabled),
-    @"currentText": _currentText
+    @"darkModeEnabled": @(darkModeEnabled)
   };
 }
 
@@ -191,6 +192,65 @@ RCT_EXPORT_MODULE();
     if (_statusLabel != nil && _loadingView != nil && ![_loadingView isHidden]) {
       _statusLabel.text = text;
       _statusLabel.hidden = text.length == 0;
+    }
+  });
+}
+
+- (UIColor *)colorFromHexString:(NSString *)hexString {
+  if (hexString == nil || [hexString length] == 0) {
+    return nil;
+  }
+
+  unsigned rgbValue = 0;
+  NSString *colorString = hexString;
+
+  // Remove # if present
+  if ([colorString hasPrefix:@"#"]) {
+    colorString = [colorString substringFromIndex:1];
+  }
+
+  NSScanner *scanner = [NSScanner scannerWithString:colorString];
+  [scanner scanHexInt:&rgbValue];
+
+  return [UIColor colorWithRed:((rgbValue & 0xFF0000) >> 16)/255.0
+                         green:((rgbValue & 0xFF00) >> 8)/255.0
+                          blue:(rgbValue & 0xFF)/255.0
+                         alpha:1.0];
+}
+
+- (void)setTextColorImpl:(NSString *)lightColor darkColor:(NSString *)darkColor {
+  if (RCTRunningInAppExtension()) {
+    return;
+  }
+
+  // Handle null parameters
+  if (lightColor == nil) {
+    lightColor = @"";
+  }
+  if (darkColor == nil) {
+    darkColor = lightColor; // Use lightColor as fallback
+  }
+
+  _lightTextColor = lightColor;
+  _darkTextColor = darkColor;
+
+  dispatch_async(dispatch_get_main_queue(), ^{
+    if (_statusLabel != nil && _loadingView != nil && ![_loadingView isHidden]) {
+      UIWindow *window = RCTKeyWindow();
+      BOOL isDarkMode = NO;
+
+      if (@available(iOS 13.0, *)) {
+        isDarkMode = window != nil && window.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
+      }
+
+      NSString *colorToUse = (isDarkMode && darkColor.length > 0) ? darkColor : lightColor;
+
+      if (colorToUse.length > 0) {
+        UIColor *color = [self colorFromHexString:colorToUse];
+        if (color != nil) {
+          _statusLabel.textColor = color;
+        }
+      }
     }
   });
 }
@@ -240,6 +300,10 @@ RCT_EXPORT_MODULE();
   [self setTextImpl:text];
 }
 
+- (void)setTextColor:(NSString *)lightColor darkColor:(NSString *)darkColor {
+  [self setTextColorImpl:lightColor darkColor:darkColor];
+}
+
 #else
 
 // Old architecture
@@ -257,6 +321,10 @@ RCT_EXPORT_METHOD(isVisible:(RCTPromiseResolveBlock)resolve
 
 RCT_EXPORT_METHOD(setText:(NSString *)text) {
   [self setTextImpl:text];
+}
+
+RCT_EXPORT_METHOD(setTextColor:(NSString *)lightColor darkColor:(NSString *)darkColor) {
+  [self setTextColorImpl:lightColor darkColor:darkColor];
 }
 
 #endif

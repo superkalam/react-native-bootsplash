@@ -280,9 +280,14 @@ export function setText(text: string) {
   NativeModule.setText(text);
 }
 
+export function setTextColor(lightColor: string, darkColor?: string): void {
+  NativeModule.setTextColor(lightColor, darkColor ?? null);
+}
+
 export default {
   hide,
   isVisible,
   useHideAnimation,
   setText,
+  setTextColor,
 };
